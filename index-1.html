@@ -1,0 +1,451 @@
+<!--
+  Copyright (c) 2026 Sava
+  All Rights Reserved.
+  Unauthorized copying or distribution is strictly prohibited.
+-->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crime Empire</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="/socket.io/socket.io.js"></script>
+<style>
+:root{--blood:#b52a1c;--blood-d:#7a1a10;--gold:#e8b84b;--gold-d:#8a6a1e;--bg:#070709;--s1:#0e0e12;--s2:#14141a;--s3:#1c1c24;--border:#23232e;--green:#1e9e5e;--blue:#1a6fa8;--red:#cc2a2a;--purple:#6e3aaa;--text:#d0d0d8;--dim:#555566;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
+.scr{display:none;}.scr.on{display:flex;}
+#sLogin{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1e0808 0%,#070709 65%);padding:20px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(70px,14vw,130px);letter-spacing:10px;line-height:.9;text-align:center;background:linear-gradient(150deg,#e8b84b 0%,#b52a1c 50%,#3a0000 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow 3s ease-in-out infinite;}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 15px rgba(181,42,28,.2))}50%{filter:drop-shadow(0 0 50px rgba(181,42,28,.6))}}
+.logo-sub{font-size:11px;letter-spacing:8px;color:var(--gold-d);text-align:center;margin-top:6px;margin-bottom:44px;text-transform:uppercase;}
+.card{background:var(--s1);border:1px solid var(--border);width:min(400px,100%);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blood),var(--gold),var(--blood),transparent);background-size:200%;animation:sh 3s linear infinite;}
+@keyframes sh{0%{background-position:200%}100%{background-position:-200%}}
+.tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:15px;background:none;border:none;color:var(--dim);font-family:'Tajawal',sans-serif;font-size:15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.fb{padding:26px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:7px;}
+.field input{width:100%;background:var(--s2);border:1px solid var(--border);padding:12px 15px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--blood);}
+.btn-p{width:100%;padding:14px;background:var(--blood);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.btn-p:hover{background:var(--blood-d);transform:translateY(-1px);}.btn-p:active{transform:translateY(1px);}.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.err-msg{color:var(--red);font-size:13px;margin-top:8px;min-height:18px;}
+#sGame{flex-direction:column;min-height:100vh;}
+.hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;color:var(--blood);}
+.hdr-r{display:flex;align-items:center;gap:12px;}
+.hdr-user{font-weight:700;color:var(--gold);font-size:14px;}
+.hdr-role{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.btn-xs{padding:5px 13px;background:var(--s2);border:1px solid var(--border);color:var(--dim);font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-xs:hover{border-color:var(--blood);color:var(--text);}
+.nav{background:var(--s2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nb{padding:12px 20px;background:none;border:none;color:var(--dim);font-family:'Tajawal',sans-serif;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.nb.on{color:var(--gold);border-bottom-color:var(--gold);}.nb:hover:not(.on){color:var(--text);}
+.body{flex:1;padding:20px;max-width:1000px;margin:0 auto;width:100%;}
+.pg{display:none;animation:fu .25s ease;}.pg.on{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:20px;}
+.st{background:var(--s1);border:1px solid var(--border);padding:15px;position:relative;overflow:hidden;}
+.st::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.st.mo::before{background:var(--gold);}.st.ht::before{background:var(--red);}.st.st2::before{background:var(--blue);}.st.sl::before{background:var(--purple);}.st.in::before{background:#e8903a;}
+.st-l{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+.st-v{font-family:'Bebas Neue',sans-serif;font-size:30px;}
+.st.mo .st-v{color:var(--gold);}.st.ht .st-v{color:var(--red);}.st.st2 .st-v{color:var(--blue);}.st.sl .st-v{color:var(--purple);}.st.in .st-v{color:#e8903a;}
+.bar{margin-top:5px;height:2px;background:var(--border);}.bf{height:100%;transition:width .5s ease;}
+.sec{font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.ab{flex:1;min-width:130px;padding:18px 12px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .2s;}
+.ab .ico{font-size:26px;}.ab .sub{font-size:10px;color:var(--dim);letter-spacing:1px;}
+.ab:hover{transform:translateY(-2px);}.ab:active{transform:translateY(0);}.ab:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.ab.att:hover{border-color:var(--blood);background:rgba(181,42,28,.08);}
+.ab.rst:hover{border-color:var(--blue);background:rgba(26,111,168,.08);}
+.ab.sur:hover{border-color:var(--gold);background:rgba(232,184,75,.08);}
+.log{background:var(--s1);border:1px solid var(--border);height:190px;overflow-y:auto;padding:8px;font-size:13px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.ll{padding:5px 10px;border-right:2px solid transparent;animation:si .25s ease;line-height:1.6;}
+@keyframes si{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.ll.ok{border-right-color:var(--green);color:#2dcc76;}.ll.fl{border-right-color:var(--red);color:#e05050;}.ll.inf{border-right-color:var(--blue);color:#5090d0;}.ll.gd{border-right-color:var(--gold);color:var(--gold);}
+.lt{color:var(--dim);font-size:10px;margin-left:6px;}
+.mc{display:flex;flex-direction:column;gap:10px;}
+.mi{background:var(--s1);border:1px solid var(--border);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;transition:all .2s;}
+.mi.av:hover{border-color:rgba(181,42,28,.5);transform:translateX(-3px);}.mi.lk{opacity:.4;}
+.mn{font-size:16px;font-weight:700;}.mm{font-size:11px;color:var(--dim);margin-top:3px;}
+.mr{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);text-align:left;}
+.mr span{display:block;font-family:'Tajawal',sans-serif;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.btn-m{margin-top:10px;padding:8px 18px;background:rgba(181,42,28,.1);border:1px solid var(--blood);color:var(--blood);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.btn-m:hover{background:var(--blood);color:#fff;}
+.pl{display:flex;flex-direction:column;gap:8px;}
+.pi{background:var(--s1);border:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
+.pn{font-size:15px;font-weight:700;}.pm{font-size:11px;color:var(--dim);margin-top:2px;}
+.btn-atk{padding:7px 16px;background:rgba(181,42,28,.1);border:1px solid var(--blood);color:var(--blood);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-atk:hover{background:var(--blood);color:#fff;}
+.sk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.ski{background:var(--s1);border:1px solid var(--border);padding:18px;text-align:center;}
+.ski-ico{font-size:30px;margin-bottom:8px;}.ski-n{font-size:15px;font-weight:700;margin-bottom:4px;}
+.ski-l{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);}.ski-c{font-size:11px;color:var(--dim);margin-bottom:10px;}
+.btn-up{width:100%;padding:9px;background:rgba(232,184,75,.08);border:1px solid var(--gold);color:var(--gold);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-up:hover{background:var(--gold);color:#000;}.btn-up:disabled{opacity:.4;cursor:not-allowed;}
+.lb{width:100%;border-collapse:collapse;}
+.lb th{text-align:right;padding:10px 14px;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.lb td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-size:14px;}
+.lb tr.r1 td{color:var(--gold);font-weight:700;}.lb tr.r2 td{color:#c0c0c0;}.lb tr.r3 td{color:#cd7f32;}
+.rn{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--dim);}
+.atbl{width:100%;border-collapse:collapse;font-size:13px;}
+.atbl th{text-align:right;padding:8px 12px;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.atbl td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);}
+.btn-jail{padding:4px 10px;background:rgba(204,42,42,.1);border:1px solid var(--red);color:var(--red);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-jail:hover{background:var(--red);color:#fff;}
+.btn-rel{padding:4px 10px;background:rgba(30,158,94,.1);border:1px solid var(--green);color:var(--green);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-rel:hover{background:var(--green);color:#fff;}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--s2);border:1px solid var(--border);border-right:3px solid var(--blood);padding:13px 26px;font-size:14px;z-index:9998;transition:transform .4s cubic-bezier(.34,1.56,.64,1);text-align:center;max-width:90vw;}
+#toast.on{transform:translateX(-50%) translateY(0);}#toast.ok{border-right-color:var(--green);}#toast.err{border-right-color:var(--red);}#toast.inf{border-right-color:var(--blue);}
+#jailBanner{display:none;background:rgba(204,42,42,.12);border-bottom:1px solid var(--red);padding:10px 20px;text-align:center;font-size:13px;color:var(--red);font-weight:700;}
+#jailBanner.on{display:block;}
+.empty{color:var(--dim);text-align:center;padding:40px;font-size:14px;}
+</style>
+</head>
+<body>
+
+<div id="sLogin" class="scr on">
+  <div class="logo">CRIME<br>EMPIRE</div>
+  <div class="logo-sub">الإمبراطورية الإجرامية</div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('login',this)">دخول</button>
+      <button class="tab" onclick="switchTab('reg',this)">تسجيل جديد</button>
+    </div>
+    <div id="fLogin" class="fb">
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="lUser" placeholder="أدخل اسمك..." onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="err-msg" id="lErr"></div>
+      <button class="btn-p" id="lBtn" onclick="login()">دخول</button>
+    </div>
+    <div id="fReg" class="fb" style="display:none">
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="rUser" placeholder="اختر اسماً فريداً..." onkeydown="if(event.key==='Enter')register()"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="rPass" placeholder="6 أحرف على الأقل" onkeydown="if(event.key==='Enter')register()"></div>
+      <div class="err-msg" id="rErr"></div>
+      <button class="btn-p" id="rBtn" onclick="register()">إنشاء حساب</button>
+    </div>
+  </div>
+</div>
+
+<div id="sGame" class="scr">
+  <div class="hdr">
+    <div class="hdr-logo">⚔ CRIME</div>
+    <div class="hdr-r">
+      <div><div class="hdr-user" id="hUser">—</div><div class="hdr-role" id="hRole">PLAYER</div></div>
+      <button class="btn-xs" onclick="logout()">خروج</button>
+    </div>
+  </div>
+  <div id="jailBanner">🔒 أنت في السجن! <span id="jailTimer"></span></div>
+  <nav class="nav">
+    <button class="nb on" onclick="nav('dash',this)">🏠 الرئيسية</button>
+    <button class="nb" onclick="nav('missions',this)">💼 المهام</button>
+    <button class="nb" onclick="nav('attack',this)">⚔️ الهجوم</button>
+    <button class="nb" onclick="nav('skills',this)">📈 المهارات</button>
+    <button class="nb" onclick="nav('lb',this)">🏆 الترتيب</button>
+    <button class="nb" id="adminTab" style="display:none" onclick="nav('admin',this)">👑 أدمن</button>
+  </nav>
+  <div class="body">
+    <div id="pg-dash" class="pg on">
+      <div class="sg">
+        <div class="st mo"><div class="st-l">💰 المال</div><div class="st-v" id="sMoney">0</div></div>
+        <div class="st ht"><div class="st-l">🔥 الحرارة</div><div class="st-v" id="sHeat">0</div><div class="bar"><div class="bf" id="bHeat" style="background:var(--red)"></div></div></div>
+        <div class="st st2"><div class="st-l">💪 القوة</div><div class="st-v" id="sStr">1</div></div>
+        <div class="st sl"><div class="st-l">🥷 التخفي</div><div class="st-v" id="sSte">1</div></div>
+        <div class="st in"><div class="st-l">🧠 الذكاء</div><div class="st-v" id="sInt">1</div></div>
+      </div>
+      <div class="sec">الإجراءات السريعة</div>
+      <div class="acts">
+        <button class="ab att" onclick="nav('missions',document.querySelectorAll('.nb')[1])"><span class="ico">🔫</span>المهام<span class="sub">MISSIONS</span></button>
+        <button class="ab sur" onclick="surrender()"><span class="ico">🤝</span>تسليم النفس<span class="sub">REDUCE HEAT</span></button>
+        <button class="ab rst" onclick="becomeAdmin()"><span class="ico">👑</span>كود الأدمن<span class="sub">ADMIN CODE</span></button>
+      </div>
+      <div class="sec">سجل العمليات</div>
+      <div class="log" id="logBox"><div class="ll inf">مرحباً في Crime Empire...</div></div>
+    </div>
+    <div id="pg-missions" class="pg"><div class="sec">المهام المتاحة</div><div class="mc" id="missionList"><div class="empty">جارٍ التحميل...</div></div></div>
+    <div id="pg-attack" class="pg"><div class="sec">اللاعبون — اختر هدفاً</div><div class="pl" id="playerList"><div class="empty">جارٍ التحميل...</div></div></div>
+    <div id="pg-skills" class="pg"><div class="sec">ترقية المهارات</div><div class="sk" id="skillCards"></div><p style="color:var(--dim);font-size:13px">تكلفة الترقية = المستوى الحالي × 5000 $</p></div>
+    <div id="pg-lb" class="pg">
+      <div class="sec">أقوى المجرمين</div>
+      <table class="lb"><thead><tr><th>#</th><th>اللاعب</th><th>المال</th><th>القوة</th><th>التخفي</th><th>الذكاء</th></tr></thead>
+      <tbody id="lbBody"><tr><td colspan="6" class="empty">جارٍ التحميل...</td></tr></tbody></table>
+    </div>
+    <div id="pg-admin" class="pg">
+      <div class="sec">لوحة التحكم</div>
+      <table class="atbl"><thead><tr><th>اللاعب</th><th>الدور</th><th>المال</th><th>الحرارة</th><th>إجراءات</th></tr></thead>
+      <tbody id="adminBody"><tr><td colspan="5" class="empty">جارٍ التحميل...</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// Copyright (c) 2026 Sava — All Rights Reserved.
+
+let TOKEN = localStorage.getItem("ce_token") || null;
+let ME = null, socket = null, jailInterval = null;
+
+async function req(path, opts={}) {
+  const h = {"Content-Type":"application/json"};
+  if (TOKEN) h["Authorization"] = `Bearer ${TOKEN}`;
+  const r = await fetch(path, {...opts, headers:h});
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || "خطأ");
+  return d;
+}
+
+let toastT;
+function toast(msg, type="inf") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `on ${type}`;
+  clearTimeout(toastT); toastT = setTimeout(()=>t.className="",3000);
+}
+
+function log(msg, type="inf") {
+  const box = document.getElementById("logBox");
+  const el = document.createElement("div");
+  el.className = `ll ${type}`;
+  const t = new Date().toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});
+  el.innerHTML = `${msg} <span class="lt">${t}</span>`;
+  box.insertBefore(el, box.firstChild);
+  while(box.children.length > 80) box.lastChild.remove();
+}
+
+function startJailTimer(jailUntil) {
+  clearInterval(jailInterval);
+  const banner = document.getElementById("jailBanner");
+  const span = document.getElementById("jailTimer");
+  function tick() {
+    const left = jailUntil - Date.now();
+    if (left <= 0) { banner.classList.remove("on"); clearInterval(jailInterval); toast("خرجت من السجن! 🔓","ok"); loadMe(); return; }
+    const m = Math.floor(left/60000), s = Math.floor((left%60000)/1000);
+    span.textContent = `متبقي: ${m}:${s.toString().padStart(2,"0")}`;
+  }
+  banner.classList.add("on"); tick(); jailInterval = setInterval(tick,1000);
+}
+
+function updateStats(p) {
+  document.getElementById("sMoney").textContent = Number(p.money).toLocaleString("ar");
+  document.getElementById("sHeat").textContent = p.heat;
+  document.getElementById("sStr").textContent = p.strength;
+  document.getElementById("sSte").textContent = p.stealth;
+  document.getElementById("sInt").textContent = p.intelligence;
+  document.getElementById("bHeat").style.width = `${Math.min(100,p.heat)}%`;
+  document.getElementById("hRole").textContent = p.role.toUpperCase();
+  if (p.role==="admin") document.getElementById("adminTab").style.display="";
+  if (p.jail_until > Date.now()) startJailTimer(p.jail_until);
+  else document.getElementById("jailBanner").classList.remove("on");
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on")); btn.classList.add("on");
+  document.getElementById("fLogin").style.display = tab==="login"?"block":"none";
+  document.getElementById("fReg").style.display = tab==="reg"?"block":"none";
+}
+
+async function login() {
+  const username = document.getElementById("lUser").value.trim();
+  const password = document.getElementById("lPass").value;
+  document.getElementById("lErr").textContent = "";
+  if (!username||!password) return document.getElementById("lErr").textContent="أدخل الاسم وكلمة المرور";
+  const btn = document.getElementById("lBtn"); btn.disabled=true; btn.textContent="جارٍ الدخول...";
+  try {
+    const data = await req("/login",{method:"POST",body:JSON.stringify({username,password})});
+    TOKEN = data.token; localStorage.setItem("ce_token",TOKEN); await enterGame();
+  } catch(e) { document.getElementById("lErr").textContent=e.message; }
+  finally { btn.disabled=false; btn.textContent="دخول"; }
+}
+
+async function register() {
+  const username = document.getElementById("rUser").value.trim();
+  const password = document.getElementById("rPass").value;
+  document.getElementById("rErr").textContent = "";
+  if (!username||!password) return document.getElementById("rErr").textContent="أدخل الاسم وكلمة المرور";
+  const btn = document.getElementById("rBtn"); btn.disabled=true; btn.textContent="جارٍ التسجيل...";
+  try {
+    await req("/register",{method:"POST",body:JSON.stringify({username,password})});
+    toast("تم إنشاء الحساب! سجّل دخولك","ok");
+    document.querySelector(".tab").click();
+    document.getElementById("lUser").value = username;
+  } catch(e) { document.getElementById("rErr").textContent=e.message; }
+  finally { btn.disabled=false; btn.textContent="إنشاء حساب"; }
+}
+
+async function loadMe() { const d=await req("/me"); ME=d; updateStats(d); return d; }
+
+async function enterGame() {
+  ME = await loadMe();
+  document.getElementById("hUser").textContent = ME.username;
+  document.getElementById("sLogin").classList.remove("on");
+  document.getElementById("sGame").classList.add("on");
+  log(`مرحباً ${ME.username}!`,"gd");
+  connectSocket();
+}
+
+function logout() {
+  TOKEN=null; ME=null; localStorage.removeItem("ce_token");
+  if(socket) socket.disconnect(); clearInterval(jailInterval);
+  document.getElementById("sGame").classList.remove("on");
+  document.getElementById("sLogin").classList.add("on");
+}
+
+function connectSocket() {
+  socket = io();
+  socket.emit("join", TOKEN);
+  socket.on("attacked",({by,lost})=>{
+    toast(`⚠️ ${by} هاجمك وسرق ${Number(lost).toLocaleString()} $!`,"err");
+    log(`💥 ${by} هاجمك وسرق ${Number(lost).toLocaleString()} $`,"fl");
+    loadMe();
+  });
+  socket.on("playerOnline",({username})=>log(`🟢 ${username} اتصل`,"inf"));
+  socket.on("playerOffline",({username})=>log(`🔴 ${username} انقطع`,"inf"));
+}
+
+function nav(page, btn) {
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".nb").forEach(b=>b.classList.remove("on"));
+  document.getElementById(`pg-${page}`).classList.add("on"); btn.classList.add("on");
+  if(page==="missions") loadMissions();
+  if(page==="attack")   loadPlayers();
+  if(page==="skills")   renderSkills();
+  if(page==="lb")       loadLeaderboard();
+  if(page==="admin")    loadAdmin();
+}
+
+async function loadMissions() {
+  try {
+    const missions = await req("/missions");
+    document.getElementById("missionList").innerHTML = missions.map(m=>{
+      const locked=(m.minStealth&&ME.stealth<m.minStealth)||(m.minStr&&ME.strength<m.minStr)||(m.minIntel&&ME.intelligence<m.minIntel);
+      const req2=m.minStealth?`تخفي ${m.minStealth}`:m.minStr?`قوة ${m.minStr}`:m.minIntel?`ذكاء ${m.minIntel}`:"متاحة";
+      return `<div class="mi ${locked?'lk':'av'}">
+        <div><div class="mn">${locked?'🔒 ':''}${m.name}</div>
+        <div class="mm">🔥 +${m.heatGain} &nbsp;|&nbsp; متطلب: ${req2}</div>
+        ${!locked?`<button class="btn-m" onclick="doMission(${m.index})">تنفيذ</button>`:''}</div>
+        <div class="mr">${Number(m.reward[0]).toLocaleString()}–${Number(m.reward[1]).toLocaleString()}<span>دولار</span></div></div>`;
+    }).join("")||`<div class="empty">لا توجد مهام</div>`;
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function doMission(index) {
+  try {
+    const data = await req("/mission",{method:"POST",body:JSON.stringify({missionIndex:index})});
+    await loadMe();
+    if(data.success) { log(`✅ ${data.mission} — ربحت ${Number(data.reward).toLocaleString()} $`,"ok"); toast(`+${Number(data.reward).toLocaleString()} $`,"ok"); }
+    else if(data.jailed) { log(`🚔 القي عليك القبض!`,"fl"); toast("أنت في السجن 🔒","err"); startJailTimer(data.jail_until); }
+    loadMissions();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadPlayers() {
+  try {
+    const players = await req("/leaderboard");
+    document.getElementById("playerList").innerHTML = players.filter(p=>p.username!==ME.username).map(p=>`
+      <div class="pi"><div><div class="pn">${p.username}</div>
+      <div class="pm">💰 ${Number(p.money).toLocaleString()} $ &nbsp;|&nbsp; 💪 ${p.strength}</div></div>
+      <button class="btn-atk" onclick="attack('${p.id}')">⚔ هجوم</button></div>`
+    ).join("")||`<div class="empty">لا يوجد لاعبون آخرون</div>`;
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function attack(targetId) {
+  try {
+    const data = await req("/attack",{method:"POST",body:JSON.stringify({targetId})});
+    await loadMe();
+    if(data.success) { log(`⚔️ هجوم ناجح — سرقت ${Number(data.stolen).toLocaleString()} $`,"ok"); toast(`+${Number(data.stolen).toLocaleString()} $`,"ok"); }
+    else { log(`💥 فشل الهجوم`,"fl"); toast("فشل الهجوم","err"); }
+    loadPlayers();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+function renderSkills() {
+  if(!ME) return;
+  const skills=[{key:"strength",icon:"💪",name:"القوة",val:ME.strength},{key:"stealth",icon:"🥷",name:"التخفي",val:ME.stealth},{key:"intelligence",icon:"🧠",name:"الذكاء",val:ME.intelligence}];
+  document.getElementById("skillCards").innerHTML = skills.map(s=>{
+    const cost=s.val*5000, can=ME.money>=cost;
+    return `<div class="ski"><div class="ski-ico">${s.icon}</div><div class="ski-n">${s.name}</div>
+      <div class="ski-l">${s.val}</div><div class="ski-c">التكلفة: ${Number(cost).toLocaleString()} $</div>
+      <button class="btn-up" onclick="upgrade('${s.key}')" ${can?'':'disabled'}>${can?'ترقية ↑':'مال غير كافٍ'}</button></div>`;
+  }).join("");
+}
+
+async function upgrade(stat) {
+  try {
+    const data = await req("/upgrade",{method:"POST",body:JSON.stringify({stat})});
+    await loadMe(); log(`📈 رقّيت ${stat} إلى مستوى ${data.newLevel}`,"gd"); toast(`ترقية ناجحة! مستوى ${data.newLevel}`,"ok"); renderSkills();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function surrender() {
+  if(!confirm("تسليم نفسك؟ ستدخل السجن دقيقتين لكن الحرارة ستصفّر")) return;
+  try {
+    const data = await req("/surrender",{method:"POST"});
+    toast(data.message,"inf"); log("🤝 سلّمت نفسك — الحرارة صفر","gd"); await loadMe(); startJailTimer(data.jail_until);
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function becomeAdmin() {
+  const code = prompt("أدخل كود الأدمن:");
+  if(!code) return;
+  try {
+    const data = await req("/become-admin",{method:"POST",body:JSON.stringify({code})});
+    toast(data.message,"ok"); log("👑 أصبحت أدمن!","gd"); await loadMe(); document.getElementById("adminTab").style.display="";
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadLeaderboard() {
+  try {
+    const rows = await req("/leaderboard");
+    const medals=["🥇","🥈","🥉"], cls=["r1","r2","r3"];
+    document.getElementById("lbBody").innerHTML = rows.map((p,i)=>`
+      <tr class="${cls[i]||''}"><td><span class="rn">${medals[i]||i+1}</span></td>
+      <td>${p.username===ME?.username?`<strong style="color:var(--gold)">${p.username} ★</strong>`:p.username}</td>
+      <td style="color:var(--gold)">${Number(p.money).toLocaleString()} $</td>
+      <td>${p.strength}</td><td>${p.stealth}</td><td>${p.intelligence}</td></tr>`
+    ).join("")||`<tr><td colspan="6" class="empty">لا يوجد لاعبون</td></tr>`;
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadAdmin() {
+  try {
+    const users = await req("/admin/users");
+    document.getElementById("adminBody").innerHTML = users.map(u=>`
+      <tr><td><strong>${u.username}</strong></td>
+      <td style="color:${u.role==='admin'?'var(--gold)':'var(--dim)'}">${u.role}</td>
+      <td>${Number(u.money).toLocaleString()} $</td>
+      <td style="color:${u.heat>50?'var(--red)':'var(--text)'}">${u.heat}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn-jail" onclick="adminJail('${u.id}')">سجن</button>
+        <button class="btn-rel" onclick="adminRelease('${u.id}')">إفراج</button></td></tr>`
+    ).join("")||`<tr><td colspan="5" class="empty">لا يوجد لاعبون</td></tr>`;
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminJail(id) {
+  const mins=prompt("مدة السجن (دقائق):","10"); if(!mins) return;
+  try { await req(`/admin/jail/${id}`,{method:"POST",body:JSON.stringify({minutes:parseInt(mins)})}); toast("تم السجن","ok"); loadAdmin(); }
+  catch(e) { toast(e.message,"err"); }
+}
+
+async function adminRelease(id) {
+  try { await req(`/admin/release/${id}`,{method:"POST"}); toast("تم الإفراج","ok"); loadAdmin(); }
+  catch(e) { toast(e.message,"err"); }
+}
+
+setInterval(async()=>{ if(ME&&TOKEN) await loadMe().catch(()=>{}); },20000);
+
+window.onload = async () => {
+  if(TOKEN) { try { await enterGame(); } catch(e) { localStorage.removeItem("ce_token"); TOKEN=null; } }
+};
+</script>
+</body>
+</html>
