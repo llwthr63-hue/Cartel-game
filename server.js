@@ -4,9 +4,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // ===== قاعدة البيانات (في الذاكرة) =====
 const users = new Map();
@@ -214,6 +216,11 @@ app.post('/api/admin/release/:id', authMiddleware, adminMiddleware, (req, res) =
   if (!target) return res.status(404).json({ error: 'مستخدم غير موجود' });
   target.jail_until = 0;
   res.json({ message: 'تم الإفراج' });
+});
+
+// ===== هذا هو الحل لـ Cannot GET / =====
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 module.exports = app;
