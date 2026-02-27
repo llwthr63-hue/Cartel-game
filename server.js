@@ -8,7 +8,6 @@ const path = require('path');
 
 const app = express();
 app.use(express.json());
-app.use(express.static(__dirname));
 
 // ===== قاعدة البيانات (في الذاكرة) =====
 const users = new Map();
@@ -218,7 +217,7 @@ app.post('/api/admin/release/:id', authMiddleware, adminMiddleware, (req, res) =
   res.json({ message: 'تم الإفراج' });
 });
 
-// ===== هذا هو الحل لـ Cannot GET / =====
+// صفحة اللعبة - يجب أن يكون آخر شيء
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
