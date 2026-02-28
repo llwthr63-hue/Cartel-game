@@ -1,0 +1,1073 @@
+<!--
+  Crime Empire — Full Version
+  Copyright (c) 2026 Sava — All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crime Empire</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--blood:#b52a1c;--blood-d:#7a1a10;--gold:#e8b84b;--gold-d:#8a6a1e;--bg:#070709;--s1:#0e0e12;--s2:#14141a;--s3:#1c1c24;--border:#23232e;--green:#1e9e5e;--blue:#1a6fa8;--red:#cc2a2a;--purple:#6e3aaa;--text:#d0d0d8;--dim:#555566;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
+.scr{display:none;}.scr.on{display:flex;}
+#sLogin{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1e0808 0%,#070709 65%);padding:20px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(70px,14vw,130px);letter-spacing:10px;line-height:.9;text-align:center;background:linear-gradient(150deg,#e8b84b 0%,#b52a1c 50%,#3a0000 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow 3s ease-in-out infinite;}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 15px rgba(181,42,28,.2))}50%{filter:drop-shadow(0 0 50px rgba(181,42,28,.6))}}
+.logo-sub{font-size:11px;letter-spacing:8px;color:var(--gold-d);text-align:center;margin-top:6px;margin-bottom:44px;text-transform:uppercase;}
+.card{background:var(--s1);border:1px solid var(--border);width:min(400px,100%);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blood),var(--gold),var(--blood),transparent);background-size:200%;animation:sh 3s linear infinite;}
+@keyframes sh{0%{background-position:200%}100%{background-position:-200%}}
+.tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:15px;background:none;border:none;color:var(--dim);font-family:'Tajawal',sans-serif;font-size:15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.fb{padding:26px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:7px;}
+.field input,.field select{width:100%;background:var(--s2);border:1px solid var(--border);padding:12px 15px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus{border-color:var(--blood);}
+.btn-p{width:100%;padding:14px;background:var(--blood);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.btn-p:hover{background:var(--blood-d);transform:translateY(-1px);}.btn-p:active{transform:translateY(1px);}.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.err-msg{color:var(--red);font-size:13px;margin-top:8px;min-height:18px;}
+.suc-msg{color:var(--green);font-size:13px;margin-top:8px;min-height:18px;}
+#sGame{flex-direction:column;min-height:100vh;}
+.hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;color:var(--blood);}
+.hdr-r{display:flex;align-items:center;gap:12px;}
+.hdr-user{font-weight:700;color:var(--gold);font-size:14px;}
+.hdr-role{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.btn-xs{padding:5px 13px;background:var(--s2);border:1px solid var(--border);color:var(--dim);font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-xs:hover{border-color:var(--blood);color:var(--text);}
+.nav{background:var(--s2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nb{padding:12px 20px;background:none;border:none;color:var(--dim);font-family:'Tajawal',sans-serif;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.nb.on{color:var(--gold);border-bottom-color:var(--gold);}.nb:hover:not(.on){color:var(--text);}
+.body{flex:1;padding:20px;max-width:1100px;margin:0 auto;width:100%;}
+.pg{display:none;animation:fu .25s ease;}.pg.on{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:20px;}
+.st{background:var(--s1);border:1px solid var(--border);padding:15px;position:relative;overflow:hidden;}
+.st::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.st.mo::before{background:var(--gold);}.st.ht::before{background:var(--red);}.st.st2::before{background:var(--blue);}.st.sl::before{background:var(--purple);}.st.in::before{background:#e8903a;}
+.st-l{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+.st-v{font-family:'Bebas Neue',sans-serif;font-size:30px;}
+.st.mo .st-v{color:var(--gold);}.st.ht .st-v{color:var(--red);}.st.st2 .st-v{color:var(--blue);}.st.sl .st-v{color:var(--purple);}.st.in .st-v{color:#e8903a;}
+.bar{margin-top:5px;height:2px;background:var(--border);}.bf{height:100%;transition:width .5s ease;}
+.sec{font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.ab{flex:1;min-width:130px;padding:18px 12px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .2s;}
+.ab .ico{font-size:26px;}.ab .sub{font-size:10px;color:var(--dim);letter-spacing:1px;}
+.ab:hover{transform:translateY(-2px);}.ab:active{transform:translateY(0);}.ab:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.ab.att:hover{border-color:var(--blood);background:rgba(181,42,28,.08);}
+.ab.rst:hover{border-color:var(--blue);background:rgba(26,111,168,.08);}
+.ab.sur:hover{border-color:var(--gold);background:rgba(232,184,75,.08);}
+.log{background:var(--s1);border:1px solid var(--border);height:190px;overflow-y:auto;padding:8px;font-size:13px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.ll{padding:5px 10px;border-right:2px solid transparent;animation:si .25s ease;line-height:1.6;}
+@keyframes si{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.ll.ok{border-right-color:var(--green);color:#2dcc76;}.ll.fl{border-right-color:var(--red);color:#e05050;}.ll.inf{border-right-color:var(--blue);color:#5090d0;}.ll.gd{border-right-color:var(--gold);color:var(--gold);}
+.lt{color:var(--dim);font-size:10px;margin-left:6px;}
+.mc{display:flex;flex-direction:column;gap:10px;}
+.mi{background:var(--s1);border:1px solid var(--border);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;transition:all .2s;}
+.mi.av:hover{border-color:rgba(181,42,28,.5);transform:translateX(-3px);}.mi.lk{opacity:.4;}
+.mn{font-size:16px;font-weight:700;}.mm{font-size:11px;color:var(--dim);margin-top:3px;}
+.mr{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);text-align:left;}
+.mr span{display:block;font-family:'Tajawal',sans-serif;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.btn-m{margin-top:10px;padding:8px 18px;background:rgba(181,42,28,.1);border:1px solid var(--blood);color:var(--blood);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.btn-m:hover{background:var(--blood);color:#fff;}
+.pl{display:flex;flex-direction:column;gap:8px;}
+.pi{background:var(--s1);border:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
+.pn{font-size:15px;font-weight:700;}.pm{font-size:11px;color:var(--dim);margin-top:2px;}
+.btn-atk{padding:7px 16px;background:rgba(181,42,28,.1);border:1px solid var(--blood);color:var(--blood);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-atk:hover{background:var(--blood);color:#fff;}
+.sk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.ski{background:var(--s1);border:1px solid var(--border);padding:18px;text-align:center;}
+.ski-ico{font-size:30px;margin-bottom:8px;}.ski-n{font-size:15px;font-weight:700;margin-bottom:4px;}
+.ski-l{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);}.ski-c{font-size:11px;color:var(--dim);margin-bottom:10px;}
+.btn-up{width:100%;padding:9px;background:rgba(232,184,75,.08);border:1px solid var(--gold);color:var(--gold);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-up:hover{background:var(--gold);color:#000;}.btn-up:disabled{opacity:.4;cursor:not-allowed;}
+.lb{width:100%;border-collapse:collapse;}
+.lb th{text-align:right;padding:10px 14px;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.lb td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-size:14px;}
+.lb tr.r1 td{color:var(--gold);font-weight:700;}.lb tr.r2 td{color:#c0c0c0;}.lb tr.r3 td{color:#cd7f32;}
+.rn{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--dim);}
+.atbl{width:100%;border-collapse:collapse;font-size:13px;}
+.atbl th{text-align:right;padding:8px 12px;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--border);}
+.atbl td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);}
+.btn-jail{padding:4px 10px;background:rgba(204,42,42,.1);border:1px solid var(--red);color:var(--red);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-jail:hover{background:var(--red);color:#fff;}
+.btn-rel{padding:4px 10px;background:rgba(30,158,94,.1);border:1px solid var(--green);color:var(--green);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-rel:hover{background:var(--green);color:#fff;}
+.btn-g{padding:4px 10px;background:rgba(232,184,75,.1);border:1px solid var(--gold);color:var(--gold);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-g:hover{background:var(--gold);color:#000;}
+.btn-blue{padding:4px 10px;background:rgba(26,111,168,.1);border:1px solid var(--blue);color:var(--blue);font-size:11px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.btn-blue:hover{background:var(--blue);color:#fff;}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--s2);border:1px solid var(--border);border-right:3px solid var(--blood);padding:13px 26px;font-size:14px;z-index:9998;transition:transform .4s cubic-bezier(.34,1.56,.64,1);text-align:center;max-width:90vw;}
+#toast.on{transform:translateX(-50%) translateY(0);}#toast.ok{border-right-color:var(--green);}#toast.err{border-right-color:var(--red);}#toast.inf{border-right-color:var(--blue);}
+#jailBanner{display:none;background:rgba(204,42,42,.12);border-bottom:1px solid var(--red);padding:10px 20px;text-align:center;font-size:13px;color:var(--red);font-weight:700;}
+#jailBanner.on{display:block;}
+.empty{color:var(--dim);text-align:center;padding:40px;font-size:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;}
+@media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+.card2{background:var(--s1);border:1px solid var(--border);padding:18px;}
+.inp{width:100%;background:var(--s2);border:1px solid var(--border);padding:10px 14px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;margin-bottom:8px;}
+.inp:focus{border-color:var(--blood);}
+.btn-sm{padding:8px 18px;background:var(--blood);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-left:6px;}
+.btn-sm:hover{background:var(--blood-d);}
+.btn-sm.green{background:var(--green);}.btn-sm.green:hover{background:#157a48;}
+.btn-sm.blue{background:var(--blue);}.btn-sm.blue:hover{background:#14578a;}
+.btn-sm.gold{background:var(--gold-d);color:#fff;}.btn-sm.gold:hover{background:#6a5018;}
+.stock-card{background:var(--s1);border:1px solid var(--border);padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.stock-name{font-weight:700;font-size:15px;}
+.stock-price{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);}
+.stock-change.up{color:var(--green);font-size:12px;}.stock-change.dn{color:var(--red);font-size:12px;}
+.weapon-card{background:var(--s1);border:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.weapon-name{font-size:15px;font-weight:700;}.weapon-price{color:var(--gold);font-size:13px;}
+.loan-card{background:var(--s1);border:1px solid var(--border);padding:16px 18px;margin-bottom:8px;}
+.loan-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+.loan-info{font-size:12px;color:var(--dim);margin-bottom:10px;}
+.clan-card{background:var(--s1);border:1px solid var(--border);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.clan-name{font-size:16px;font-weight:700;}.clan-tag{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);margin-left:8px;}
+.clan-info{font-size:11px;color:var(--dim);margin-top:3px;}
+.chat-box{background:var(--s1);border:1px solid var(--border);height:350px;overflow-y:auto;padding:12px;margin-bottom:10px;scrollbar-width:thin;}
+.chat-msg{padding:8px 10px;margin-bottom:6px;border-right:2px solid var(--border);animation:si .2s ease;}
+.chat-msg .chat-user{font-weight:700;font-size:13px;color:var(--gold);}
+.chat-msg .chat-user.gov{color:#9b59b6;}
+.chat-msg .chat-text{font-size:14px;margin-top:2px;}
+.chat-msg .chat-time{font-size:10px;color:var(--dim);margin-top:2px;}
+.sys-toggle{background:var(--s1);border:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sys-name{font-size:15px;font-weight:700;}
+.toggle{position:relative;display:inline-block;width:44px;height:24px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-sl{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);transition:.3s;border-radius:24px;}
+.toggle-sl:before{position:absolute;content:'';height:18px;width:18px;right:3px;bottom:3px;background:var(--dim);transition:.3s;border-radius:50%;}
+input:checked+.toggle-sl{background:var(--green);}
+input:checked+.toggle-sl:before{transform:translateX(-20px);background:#fff;}
+.badge{display:inline-block;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:1px;border-radius:2px;}
+.badge.admin{background:rgba(181,42,28,.2);color:var(--blood);border:1px solid var(--blood);}
+.badge.gov{background:rgba(110,58,170,.2);color:#9b59b6;border:1px solid #9b59b6;}
+.badge.player{background:var(--s2);color:var(--dim);border:1px solid var(--border);}
+.badge.leader{background:rgba(232,184,75,.2);color:var(--gold);border:1px solid var(--gold);}
+.badge.deputy{background:rgba(26,111,168,.2);color:var(--blue);border:1px solid var(--blue);}
+</style>
+</head>
+<body>
+
+<div id="sLogin" class="scr on">
+  <div class="logo">CRIME<br>EMPIRE</div>
+  <div class="logo-sub">الإمبراطورية الإجرامية</div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('login',this)">دخول</button>
+      <button class="tab" onclick="switchTab('reg',this)">تسجيل جديد</button>
+    </div>
+    <div id="fLogin" class="fb">
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="lUser" placeholder="أدخل اسمك..." onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="err-msg" id="lErr"></div>
+      <button class="btn-p" id="lBtn" onclick="login()">دخول</button>
+    </div>
+    <div id="fReg" class="fb" style="display:none">
+      <div class="field"><label>اسم المستخدم</label><input type="text" id="rUser" placeholder="اختر اسماً فريداً..."></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" id="rPass" placeholder="6 أحرف على الأقل"></div>
+      <div class="err-msg" id="rErr"></div>
+      <div class="suc-msg" id="rSuc"></div>
+      <button class="btn-p" id="rBtn" onclick="register()">إنشاء حساب</button>
+    </div>
+  </div>
+</div>
+
+<div id="sGame" class="scr">
+  <div class="hdr">
+    <div class="hdr-logo">⚔ CRIME</div>
+    <div class="hdr-r">
+      <div><div class="hdr-user" id="hUser">—</div><div class="hdr-role" id="hRole">PLAYER</div></div>
+      <button class="btn-xs" onclick="logout()">خروج</button>
+    </div>
+  </div>
+  <div id="jailBanner">🔒 أنت في السجن! <span id="jailTimer"></span></div>
+  <nav class="nav">
+    <button class="nb on" onclick="nav('dash',this)">🏠 الرئيسية</button>
+    <button class="nb" onclick="nav('missions',this)">💼 المهام</button>
+    <button class="nb" onclick="nav('attack',this)">⚔️ الهجوم</button>
+    <button class="nb" onclick="nav('skills',this)">📈 المهارات</button>
+    <button class="nb" onclick="nav('weapons',this)">🔫 الأسلحة</button>
+    <button class="nb" onclick="nav('casino',this)">🎰 الكازينو</button>
+    <button class="nb" onclick="nav('stocks',this)">📊 الأسهم</button>
+    <button class="nb" onclick="nav('launder',this)">💸 الغسيل</button>
+    <button class="nb" onclick="nav('loans',this)">🏦 القروض</button>
+    <button class="nb" onclick="nav('spy',this)">🕵️ التجسس</button>
+    <button class="nb" onclick="nav('clans',this)">🛡️ العشائر</button>
+    <button class="nb" onclick="nav('chat',this)">💬 الدردشة</button>
+    <button class="nb" onclick="nav('lb',this)">🏆 الترتيب</button>
+    <button class="nb" id="govTab" style="display:none" onclick="nav('gov',this)">🏛️ الحاكم</button>
+    <button class="nb" id="adminTab" style="display:none" onclick="nav('admin',this)">👑 الأدمن</button>
+  </nav>
+  <div class="body">
+
+    <!-- الرئيسية -->
+    <div id="pg-dash" class="pg on">
+      <div class="sg">
+        <div class="st mo"><div class="st-l">💰 المال</div><div class="st-v" id="sMoney">0</div></div>
+        <div class="st ht"><div class="st-l">🔥 الحرارة</div><div class="st-v" id="sHeat">0</div><div class="bar"><div class="bf" id="bHeat" style="background:var(--red)"></div></div></div>
+        <div class="st st2"><div class="st-l">💪 القوة</div><div class="st-v" id="sStr">1</div></div>
+        <div class="st sl"><div class="st-l">🥷 التخفي</div><div class="st-v" id="sSte">1</div></div>
+        <div class="st in"><div class="st-l">🧠 الذكاء</div><div class="st-v" id="sInt">1</div></div>
+        <div class="st mo"><div class="st-l">📊 المستوى</div><div class="st-v" id="sLvl">1</div></div>
+      </div>
+      <div class="sec">الإجراءات السريعة</div>
+      <div class="acts">
+        <button class="ab att" onclick="nav('missions',document.querySelectorAll('.nb')[1])"><span class="ico">🔫</span>المهام<span class="sub">MISSIONS</span></button>
+        <button class="ab sur" onclick="surrender()"><span class="ico">🤝</span>تسليم النفس<span class="sub">REDUCE HEAT</span></button>
+        <button class="ab rst" onclick="becomeAdmin()"><span class="ico">🔑</span>إدخال كود<span class="sub">ENTER CODE</span></button>
+      </div>
+      <div class="sec">سجل العمليات</div>
+      <div class="log" id="logBox"><div class="ll inf">مرحباً في Crime Empire...</div></div>
+    </div>
+
+    <!-- المهام -->
+    <div id="pg-missions" class="pg"><div class="sec">المهام المتاحة</div><div class="mc" id="missionList"><div class="empty">جارٍ التحميل...</div></div></div>
+
+    <!-- الهجوم -->
+    <div id="pg-attack" class="pg"><div class="sec">اللاعبون — اختر هدفاً</div><div class="pl" id="playerList"><div class="empty">جارٍ التحميل...</div></div></div>
+
+    <!-- المهارات -->
+    <div id="pg-skills" class="pg"><div class="sec">ترقية المهارات</div><div class="sk" id="skillCards"></div><p style="color:var(--dim);font-size:13px">تكلفة الترقية = المستوى الحالي × 5000 $</p></div>
+
+    <!-- الأسلحة -->
+    <div id="pg-weapons" class="pg">
+      <div class="sec">متجر الأسلحة</div>
+      <div id="weaponStore"></div>
+      <div class="sec">أسلحتي</div>
+      <div id="myWeapons"></div>
+    </div>
+
+    <!-- الكازينو -->
+    <div id="pg-casino" class="pg">
+      <div class="sec">روليت الكازينو</div>
+      <div class="card2">
+        <div style="margin-bottom:12px;font-size:13px;color:var(--dim)">اختر لونك أو رقمك والمبلغ</div>
+        <input type="number" class="inp" id="betAmount" placeholder="المبلغ...">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <button class="btn-sm" style="background:#b52a1c" onclick="bet('red')">🔴 أحمر (2x)</button>
+          <button class="btn-sm" style="background:#222" onclick="bet('black')">⚫ أسود (2x)</button>
+          <button class="btn-sm green" onclick="bet(0)">🟢 صفر (35x)</button>
+        </div>
+        <input type="number" class="inp" id="betNum" placeholder="أو اختر رقم 1-36..." min="1" max="36">
+        <button class="btn-sm" onclick="betNumber()">🎯 راهن على الرقم (35x)</button>
+        <div id="casinoResult" style="margin-top:16px;font-size:15px;min-height:30px;"></div>
+      </div>
+    </div>
+
+    <!-- الأسهم -->
+    <div id="pg-stocks" class="pg">
+      <div class="sec">سوق الأسهم</div>
+      <div id="stockList"></div>
+      <div class="sec">محفظتي</div>
+      <div id="portfolioList"></div>
+    </div>
+
+    <!-- غسيل المال -->
+    <div id="pg-launder" class="pg">
+      <div class="sec">غسيل الأموال</div>
+      <div class="card2">
+        <p style="color:var(--dim);font-size:13px;margin-bottom:12px">رسوم الغسيل 25% — تحتاج مال قذر من المهام</p>
+        <div style="margin-bottom:12px;">💰 المال القذر: <span id="dirtyMoney" style="color:var(--gold);font-weight:700">0</span> $</div>
+        <input type="number" class="inp" id="launderAmount" placeholder="المبلغ للغسيل...">
+        <button class="btn-sm green" onclick="launder()">💸 غسّل</button>
+      </div>
+    </div>
+
+    <!-- القروض -->
+    <div id="pg-loans" class="pg">
+      <div class="sec">خطط القروض (مستوى 3+)</div>
+      <div id="loanPlans"></div>
+      <div class="sec">قروضي النشطة</div>
+      <div id="myLoans"></div>
+    </div>
+
+    <!-- التجسس -->
+    <div id="pg-spy" class="pg">
+      <div class="sec">التجسس على اللاعبين</div>
+      <p style="color:var(--dim);font-size:13px;margin-bottom:16px">التكلفة = مستوى الذكاء × 1000 $</p>
+      <div class="pl" id="spyList"></div>
+    </div>
+
+    <!-- العشائر -->
+    <div id="pg-clans" class="pg">
+      <div id="myClanSection"></div>
+      <div class="sec">العشائر</div>
+      <div id="clanList"></div>
+      <div class="sec">إنشاء عشيرة جديدة (10,000 $)</div>
+      <div class="card2">
+        <input type="text" class="inp" id="clanName" placeholder="اسم العشيرة...">
+        <input type="text" class="inp" id="clanTag" placeholder="التاج (3-5 أحرف)..." maxlength="5">
+        <input type="text" class="inp" id="clanDesc" placeholder="وصف (اختياري)...">
+        <button class="btn-sm gold" onclick="createClan()">🛡️ إنشاء العشيرة</button>
+      </div>
+    </div>
+
+    <!-- الدردشة -->
+    <div id="pg-chat" class="pg">
+      <div class="sec">الدردشة العامة</div>
+      <div class="chat-box" id="chatBox"></div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" class="inp" id="chatInput" placeholder="اكتب رسالة..." style="margin:0;flex:1" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn-sm" onclick="sendChat()">إرسال</button>
+      </div>
+    </div>
+
+    <!-- الترتيب -->
+    <div id="pg-lb" class="pg">
+      <div class="sec">أقوى المجرمين</div>
+      <table class="lb"><thead><tr><th>#</th><th>اللاعب</th><th>المال</th><th>القوة</th><th>التخفي</th><th>الذكاء</th></tr></thead>
+      <tbody id="lbBody"></tbody></table>
+    </div>
+
+    <!-- لوحة الحاكم -->
+    <div id="pg-gov" class="pg">
+      <div class="sec">🏛️ لوحة الحاكم</div>
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--dim);margin-bottom:12px">إعطاء فلوس للاعب</div>
+        <select class="inp" id="govTarget"><option value="">اختر لاعب...</option></select>
+        <input type="number" class="inp" id="govAmount" placeholder="المبلغ...">
+        <button class="btn-sm green" onclick="govGiveMoney()">💰 إعطاء</button>
+      </div>
+      <div class="sec">إدارة اللاعبين</div>
+      <table class="atbl"><thead><tr><th>اللاعب</th><th>الدور</th><th>المال</th><th>الحرارة</th><th>إجراءات</th></tr></thead>
+      <tbody id="govBody"></tbody></table>
+    </div>
+
+    <!-- لوحة الأدمن -->
+    <div id="pg-admin" class="pg">
+      <div class="sec">👑 لوحة الأدمن</div>
+
+      <!-- إعطاء فلوس -->
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">💰 إعطاء فلوس</div>
+        <select class="inp" id="adminMoneyTarget"><option value="">اختر لاعب...</option></select>
+        <input type="number" class="inp" id="adminMoneyAmount" placeholder="المبلغ...">
+        <button class="btn-sm green" onclick="adminGiveMoney()">إعطاء</button>
+      </div>
+
+      <!-- إعطاء سلاح -->
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">🔫 إعطاء سلاح</div>
+        <select class="inp" id="adminWeaponTarget"><option value="">اختر لاعب...</option></select>
+        <select class="inp" id="adminWeaponId">
+          <option value="">اختر سلاح...</option>
+          <option value="knife">🔪 سكين</option>
+          <option value="pistol">🔫 مسدس</option>
+          <option value="rifle">🎯 بندقية</option>
+          <option value="shotgun">💥 شوتقن</option>
+          <option value="rpg">🚀 آر بي جي</option>
+        </select>
+        <button class="btn-sm blue" onclick="adminGiveWeapon()">إعطاء</button>
+      </div>
+
+      <!-- تعيين حاكم -->
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">🏛️ تعيين / إزالة حاكم</div>
+        <select class="inp" id="adminGovTarget"><option value="">اختر لاعب...</option></select>
+        <button class="btn-sm gold" onclick="adminSetGov()">تعيين حاكم</button>
+        <button class="btn-sm" onclick="adminRemoveGov()">إزالة حاكم</button>
+      </div>
+
+      <!-- إعادة ضبط الأسهم -->
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">📊 إعادة ضبط الأسهم</div>
+        <button class="btn-sm" onclick="adminResetStocks()">🔄 إعادة ضبط الأسهم</button>
+      </div>
+
+      <!-- التحكم بالأنظمة -->
+      <div class="sec">التحكم بالأنظمة</div>
+      <div id="systemsControl"></div>
+
+      <!-- إضافة نظام -->
+      <div class="card2" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">➕ إضافة نظام جديد</div>
+        <input type="text" class="inp" id="newSysId" placeholder="معرف النظام (بالإنجليزي)...">
+        <input type="text" class="inp" id="newSysName" placeholder="اسم النظام (بالعربي)...">
+        <input type="text" class="inp" id="newSysIcon" placeholder="أيقونة (اختياري)...">
+        <button class="btn-sm green" onclick="adminAddSystem()">➕ إضافة</button>
+      </div>
+
+      <!-- إدارة اللاعبين -->
+      <div class="sec">إدارة اللاعبين</div>
+      <table class="atbl"><thead><tr><th>اللاعب</th><th>الدور</th><th>المال</th><th>الحرارة</th><th>إجراءات</th></tr></thead>
+      <tbody id="adminBody"></tbody></table>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let TOKEN = localStorage.getItem("ce_token") || null;
+let ME = null, jailInterval = null, chatInterval = null;
+
+async function req(path, opts={}) {
+  const h = {"Content-Type":"application/json"};
+  if (TOKEN) h["Authorization"] = `Bearer ${TOKEN}`;
+  const r = await fetch(path, {...opts, headers:h});
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || "خطأ");
+  return d;
+}
+
+let toastT;
+function toast(msg, type="inf") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `on ${type}`;
+  clearTimeout(toastT); toastT = setTimeout(()=>t.className="",3500);
+}
+
+function log(msg, type="inf") {
+  const box = document.getElementById("logBox");
+  const el = document.createElement("div");
+  el.className = `ll ${type}`;
+  const t = new Date().toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});
+  el.innerHTML = `${msg} <span class="lt">${t}</span>`;
+  box.insertBefore(el, box.firstChild);
+  while(box.children.length > 80) box.lastChild.remove();
+}
+
+function startJailTimer(jailUntil) {
+  clearInterval(jailInterval);
+  const banner = document.getElementById("jailBanner");
+  const span = document.getElementById("jailTimer");
+  function tick() {
+    const left = jailUntil - Date.now();
+    if (left <= 0) { banner.classList.remove("on"); clearInterval(jailInterval); toast("خرجت من السجن! 🔓","ok"); loadMe(); return; }
+    const m = Math.floor(left/60000), s = Math.floor((left%60000)/1000);
+    span.textContent = `متبقي: ${m}:${s.toString().padStart(2,"0")}`;
+  }
+  banner.classList.add("on"); tick(); jailInterval = setInterval(tick,1000);
+}
+
+function updateStats(p) {
+  ME = p;
+  document.getElementById("sMoney").textContent = Number(p.money).toLocaleString("ar");
+  document.getElementById("sHeat").textContent = p.heat;
+  document.getElementById("sStr").textContent = p.strength;
+  document.getElementById("sSte").textContent = p.stealth;
+  document.getElementById("sInt").textContent = p.intelligence;
+  document.getElementById("sLvl").textContent = p.level || 1;
+  document.getElementById("bHeat").style.width = `${Math.min(100,p.heat)}%`;
+  document.getElementById("hUser").textContent = p.username;
+  document.getElementById("dirtyMoney").textContent = Number(p.dirtyMoney||0).toLocaleString();
+  
+  // الدور المعروض
+  const roleMap = { admin: 'ADMIN 👑', governor: 'حاكم 🏛️', player: 'PLAYER' };
+  document.getElementById("hRole").textContent = roleMap[p.role] || p.role.toUpperCase();
+  
+  // إظهار تبويبات الصلاحيات
+  if (p.role === "admin") {
+    document.getElementById("adminTab").style.display = "";
+    document.getElementById("govTab").style.display = "";
+  } else if (p.role === "governor") {
+    document.getElementById("govTab").style.display = "";
+  }
+  
+  if (p.jail_until > Date.now()) startJailTimer(p.jail_until);
+  else document.getElementById("jailBanner").classList.remove("on");
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on")); btn.classList.add("on");
+  document.getElementById("fLogin").style.display = tab==="login"?"block":"none";
+  document.getElementById("fReg").style.display = tab==="reg"?"block":"none";
+}
+
+async function login() {
+  const username = document.getElementById("lUser").value.trim();
+  const password = document.getElementById("lPass").value;
+  const err = document.getElementById("lErr");
+  err.textContent = "";
+  if (!username||!password) return err.textContent="أدخل الاسم وكلمة المرور";
+  const btn = document.getElementById("lBtn"); btn.disabled=true; btn.textContent="جارٍ الدخول...";
+  try {
+    const data = await req("/api/login",{method:"POST",body:JSON.stringify({username,password})});
+    TOKEN = data.token; localStorage.setItem("ce_token",TOKEN); await enterGame();
+  } catch(e) { err.textContent=e.message; }
+  finally { btn.disabled=false; btn.textContent="دخول"; }
+}
+
+async function register() {
+  const username = document.getElementById("rUser").value.trim();
+  const password = document.getElementById("rPass").value;
+  const err = document.getElementById("rErr"); const suc = document.getElementById("rSuc");
+  err.textContent=""; suc.textContent="";
+  if (!username||!password) return err.textContent="أدخل الاسم وكلمة المرور";
+  const btn = document.getElementById("rBtn"); btn.disabled=true; btn.textContent="جارٍ التسجيل...";
+  try {
+    await req("/api/register",{method:"POST",body:JSON.stringify({username,password})});
+    suc.textContent = "✅ تم إنشاء الحساب!";
+    const data = await req("/api/login",{method:"POST",body:JSON.stringify({username,password})});
+    TOKEN = data.token; localStorage.setItem("ce_token",TOKEN); await enterGame();
+  } catch(e) { err.textContent=e.message; }
+  finally { btn.disabled=false; btn.textContent="إنشاء حساب"; }
+}
+
+async function loadMe() {
+  try { const p = await req("/api/me"); updateStats(p); } catch(e) { logout(); }
+}
+
+async function enterGame() {
+  try {
+    const p = await req("/api/me");
+    updateStats(p);
+    document.getElementById("sLogin").classList.remove("on");
+    document.getElementById("sGame").classList.add("on");
+    log(`مرحباً ${p.username}! 👋`, "gd");
+    loadMissions();
+  } catch(e) { localStorage.removeItem("ce_token"); TOKEN = null; }
+}
+
+function logout() {
+  TOKEN = null; ME = null;
+  localStorage.removeItem("ce_token");
+  clearInterval(jailInterval); clearInterval(chatInterval);
+  document.getElementById("sGame").classList.remove("on");
+  document.getElementById("sLogin").classList.add("on");
+  document.getElementById("adminTab").style.display="none";
+  document.getElementById("govTab").style.display="none";
+}
+
+function nav(pg, btn) {
+  document.querySelectorAll(".nb").forEach(b=>b.classList.remove("on")); btn.classList.add("on");
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));
+  document.getElementById(`pg-${pg}`).classList.add("on");
+  clearInterval(chatInterval);
+  if(pg==="missions") loadMissions();
+  if(pg==="attack") loadPlayers();
+  if(pg==="skills") loadSkills();
+  if(pg==="weapons") loadWeapons();
+  if(pg==="stocks") loadStocks();
+  if(pg==="loans") loadLoans();
+  if(pg==="spy") loadSpyList();
+  if(pg==="clans") loadClans();
+  if(pg==="lb") loadLeaderboard();
+  if(pg==="chat") { loadChat(); chatInterval = setInterval(loadChat, 5000); }
+  if(pg==="admin") { loadAdmin(); loadAdminSystems(); }
+  if(pg==="gov") loadGov();
+}
+
+async function loadMissions() {
+  try {
+    const missions = await req("/api/missions");
+    const box = document.getElementById("missionList"); box.innerHTML = "";
+    missions.forEach(m => {
+      const locked = (m.minStr && ME && ME.strength < m.minStr) ||
+                     (m.minStealth && ME && ME.stealth < m.minStealth) ||
+                     (m.minIntel && ME && ME.intelligence < m.minIntel);
+      const reqs = [];
+      if(m.minStr) reqs.push(`قوة ${m.minStr}`);
+      if(m.minStealth) reqs.push(`تخفي ${m.minStealth}`);
+      if(m.minIntel) reqs.push(`ذكاء ${m.minIntel}`);
+      const div = document.createElement("div");
+      div.className = `mi ${locked?"lk":"av"}`;
+      div.innerHTML = `
+        <div><div class="mn">${m.name}</div>
+        <div class="mm">${reqs.length?`يتطلب: ${reqs.join(", ")}`:"متاح للجميع"}</div>
+        ${!locked?`<button class="btn-m" onclick="doMission(${m.index})">تنفيذ المهمة</button>`:""}
+        </div>
+        <div class="mr">${m.reward[0].toLocaleString()}-${m.reward[1].toLocaleString()}<span>$ المكافأة</span></div>`;
+      box.appendChild(div);
+    });
+  } catch(e) { toast("خطأ في تحميل المهام","err"); }
+}
+
+async function doMission(idx) {
+  try {
+    const d = await req("/api/mission",{method:"POST",body:JSON.stringify({missionIndex:idx})});
+    if(d.jailed) { toast("🚨 تم القبض عليك!","err"); log("تم القبض عليك! 🚔","fl"); startJailTimer(d.jail_until); }
+    else { toast(`✅ ربحت ${d.reward.toLocaleString()} $`,"ok"); log(`نجحت في "${d.mission}" وربحت ${d.reward.toLocaleString()} $`,"ok"); }
+    loadMe();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadPlayers() {
+  try {
+    const lb = await req("/api/leaderboard");
+    const box = document.getElementById("playerList"); box.innerHTML = "";
+    const others = lb.filter(p=>p.id !== (ME&&ME.id));
+    if(!others.length) { box.innerHTML='<div class="empty">لا يوجد لاعبون آخرون</div>'; return; }
+    others.forEach(p => {
+      const div = document.createElement("div"); div.className = "pi";
+      div.innerHTML = `
+        <div><div class="pn">${p.username} ${p.role==="governor"?"🏛️":""}</div>
+        <div class="pm">💰 ${p.money.toLocaleString()} $ | ${p.jail_until>Date.now()?"🔒 في السجن":"حر"}</div></div>
+        <button class="btn-atk" onclick="attack('${p.id}','${p.username}')" ${p.jail_until>Date.now()?"disabled":""}>هجوم ⚔️</button>`;
+      box.appendChild(div);
+    });
+  } catch(e) { toast("خطأ","err"); }
+}
+
+async function attack(targetId, name) {
+  try {
+    const d = await req("/api/attack",{method:"POST",body:JSON.stringify({targetId})});
+    if(d.success) { toast(`✅ سرقت ${d.stolen.toLocaleString()} $ من ${name}`,"ok"); log(`هاجمت ${name} وسرقت ${d.stolen.toLocaleString()} $`,"ok"); }
+    else { toast(`❌ فشل الهجوم على ${name}`,"err"); log(`فشلت في مهاجمة ${name}`,"fl"); }
+    loadMe();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+function loadSkills() {
+  if(!ME) return;
+  const box = document.getElementById("skillCards");
+  const stats = [
+    {key:"strength",name:"القوة",ico:"💪",val:ME.strength},
+    {key:"stealth",name:"التخفي",ico:"🥷",val:ME.stealth},
+    {key:"intelligence",name:"الذكاء",ico:"🧠",val:ME.intelligence},
+  ];
+  box.innerHTML = stats.map(s=>`
+    <div class="ski">
+      <div class="ski-ico">${s.ico}</div><div class="ski-n">${s.name}</div>
+      <div class="ski-l">${s.val}</div>
+      <div class="ski-c">التكلفة: ${(s.val*5000).toLocaleString()} $</div>
+      <button class="btn-up" onclick="upgrade('${s.key}')" ${ME.money<s.val*5000?"disabled":""}>ترقية ↑</button>
+    </div>`).join("");
+}
+
+async function upgrade(stat) {
+  try {
+    const d = await req("/api/upgrade",{method:"POST",body:JSON.stringify({stat})});
+    toast(`✅ المستوى الجديد: ${d.newLevel}`,"ok");
+    log(`رقّيت مهارة إلى ${d.newLevel}`,"gd");
+    await loadMe(); loadSkills();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadWeapons() {
+  try {
+    const d = await req("/api/weapons");
+    const store = document.getElementById("weaponStore");
+    const myW = document.getElementById("myWeapons");
+    store.innerHTML = d.weapons.map(w => `
+      <div class="weapon-card">
+        <div><div class="weapon-name">${w.icon} ${w.name}</div>
+        <div class="weapon-price">💰 ${w.price.toLocaleString()} $ | 💪 +${w.strBonus}</div></div>
+        ${d.owned.includes(w.id) ?
+          `<button class="btn-sm ${d.active===w.id?'gold':''}" onclick="equipWeapon('${w.id}')">${d.active===w.id?'مجهّز ✓':'تجهيز'}</button>` :
+          `<button class="btn-sm" onclick="buyWeapon('${w.id}')">شراء</button>`}
+      </div>`).join("");
+    if(!d.owned.length) { myW.innerHTML='<div class="empty">لا تملك أسلحة</div>'; return; }
+    myW.innerHTML = d.owned.map(wId => {
+      const w = d.weapons.find(x=>x.id===wId);
+      return w ? `<div class="weapon-card"><div class="weapon-name">${w.icon} ${w.name} | +${w.strBonus} قوة</div>
+        ${d.active===wId ? '<span class="badge admin">مجهّز</span>' : `<button class="btn-sm" onclick="equipWeapon('${wId}')">تجهيز</button>`}
+        </div>` : '';
+    }).join("");
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function buyWeapon(id) {
+  try { await req("/api/weapons/buy",{method:"POST",body:JSON.stringify({weaponId:id})}); toast("تم الشراء ✅","ok"); await loadMe(); loadWeapons(); } catch(e) { toast(e.message,"err"); }
+}
+async function equipWeapon(id) {
+  try { const d = await req("/api/weapons/equip",{method:"POST",body:JSON.stringify({weaponId:id})}); toast(d.message,"ok"); await loadMe(); loadWeapons(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadStocks() {
+  try {
+    const d = await req("/api/stocks");
+    const list = document.getElementById("stockList");
+    const port = document.getElementById("portfolioList");
+    list.innerHTML = d.stocks.map(s => `
+      <div class="stock-card">
+        <div>
+          <div class="stock-name">📊 ${s.name}</div>
+          <div class="stock-price">${s.price.toLocaleString()} $</div>
+          <div class="stock-change ${s.change>=0?'up':'dn'}">${s.change>=0?'▲':'▼'} ${Math.abs(s.change*100).toFixed(1)}%</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;gap:6px">
+            <input type="number" id="qty_${s.id}" placeholder="كمية" style="width:80px;background:var(--s2);border:1px solid var(--border);padding:6px;color:var(--text);font-size:13px;outline:none">
+            <button class="btn-sm green" onclick="buyStock('${s.id}')">شراء</button>
+            <button class="btn-sm" onclick="sellStock('${s.id}')">بيع</button>
+          </div>
+          <div style="font-size:11px;color:var(--dim)">تملك: ${d.portfolio[s.id]||0} سهم</div>
+        </div>
+      </div>`).join("");
+    const portItems = Object.entries(d.portfolio).filter(([,v])=>v>0);
+    port.innerHTML = portItems.length ? portItems.map(([id,qty]) => {
+      const s = d.stocks.find(x=>x.id===id);
+      return s ? `<div class="stock-card"><div class="stock-name">${s.name}</div><div style="color:var(--gold)">${qty} سهم = ${(s.price*qty).toLocaleString()} $</div></div>` : '';
+    }).join("") : '<div class="empty">لا تملك أسهم</div>';
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function buyStock(id) {
+  const qty = parseInt(document.getElementById(`qty_${id}`).value);
+  if(!qty||qty<=0) return toast("أدخل كمية","err");
+  try { await req("/api/stocks/buy",{method:"POST",body:JSON.stringify({stockId:id,quantity:qty})}); toast("تم الشراء ✅","ok"); await loadMe(); loadStocks(); } catch(e) { toast(e.message,"err"); }
+}
+async function sellStock(id) {
+  const qty = parseInt(document.getElementById(`qty_${id}`).value);
+  if(!qty||qty<=0) return toast("أدخل كمية","err");
+  try { await req("/api/stocks/sell",{method:"POST",body:JSON.stringify({stockId:id,quantity:qty})}); toast("تم البيع ✅","ok"); await loadMe(); loadStocks(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function launder() {
+  const amount = parseInt(document.getElementById("launderAmount").value);
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try { const d = await req("/api/launder",{method:"POST",body:JSON.stringify({amount})}); toast(`✅ تم غسل ${amount.toLocaleString()} $ (رسوم: ${d.fee.toLocaleString()} $)`,"ok"); await loadMe(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadLoans() {
+  try {
+    const plans = await req("/api/loans/plans");
+    const plansEl = document.getElementById("loanPlans");
+    const myEl = document.getElementById("myLoans");
+    plansEl.innerHTML = plans.map(p => `
+      <div class="loan-card">
+        <div class="loan-name">🏦 ${p.name}</div>
+        <div class="loan-info">المبلغ: ${p.amount.toLocaleString()} $ | المدة: ${p.hours} ساعة | الفائدة: ${p.interest*100}%</div>
+        <div class="loan-info">إجمالي السداد: ${Math.floor(p.amount*(1+p.interest)).toLocaleString()} $</div>
+        <button class="btn-sm green" onclick="takeLoan(${p.id})">أخذ القرض</button>
+      </div>`).join("");
+    const activeLoans = (ME?.loans||[]).filter(l=>l.status==='active');
+    myEl.innerHTML = activeLoans.length ? activeLoans.map(l => {
+      const remaining = Math.max(0, l.dueAt - Date.now());
+      const hrs = Math.floor(remaining/3600000);
+      const isLate = Date.now() > l.dueAt;
+      return `<div class="loan-card">
+        <div class="loan-name">📋 ${l.planName}</div>
+        <div class="loan-info">للسداد: ${l.totalDue.toLocaleString()} $ | ${isLate?'<span style="color:var(--red)">⚠️ متأخر!</span>':`متبقي: ${hrs} ساعة`}</div>
+        <button class="btn-sm" onclick="repayLoan(${l.planId})">سداد القرض</button>
+      </div>`;
+    }).join("") : '<div class="empty">لا يوجد قروض نشطة</div>';
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function takeLoan(planId) {
+  try { const d = await req("/api/loans/take",{method:"POST",body:JSON.stringify({planId})}); toast(d.message,"ok"); await loadMe(); loadLoans(); } catch(e) { toast(e.message,"err"); }
+}
+async function repayLoan(planId) {
+  try { const d = await req("/api/loans/repay",{method:"POST",body:JSON.stringify({planId})}); toast(d.message,"ok"); await loadMe(); loadLoans(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadSpyList() {
+  try {
+    const lb = await req("/api/leaderboard");
+    const box = document.getElementById("spyList"); box.innerHTML = "";
+    const others = lb.filter(p=>p.id !== (ME&&ME.id));
+    if(!others.length) { box.innerHTML='<div class="empty">لا يوجد لاعبون</div>'; return; }
+    const cost = (ME?.intelligence||1) * 1000;
+    others.forEach(p => {
+      const div = document.createElement("div"); div.className = "pi";
+      div.innerHTML = `
+        <div><div class="pn">${p.username}</div>
+        <div class="pm">💰 ${p.money.toLocaleString()} $</div></div>
+        <button class="btn-atk" onclick="spyOn('${p.id}','${p.username}')">تجسس (${cost.toLocaleString()} $)</button>`;
+      box.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+async function spyOn(targetId, name) {
+  try {
+    const d = await req("/api/spy",{method:"POST",body:JSON.stringify({targetId})});
+    if(d.success) {
+      toast(`🕵️ معلومات ${name}: مال=${d.info.money.toLocaleString()} | حرارة=${d.info.heat} | قوة=${d.info.strength}`,"ok");
+      log(`تجسست على ${name} بنجاح 🕵️`,"gd");
+    } else { toast("❌ فشلت عملية التجسس","err"); }
+    loadMe();
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadClans() {
+  try {
+    const clans = await req("/api/clans");
+    const list = document.getElementById("clanList");
+    const mySection = document.getElementById("myClanSection");
+
+    if(ME?.clanId) {
+      const myClan = clans.find(c=>c.id===ME.clanId);
+      if(myClan) {
+        const canWithdraw = ME.clanRole === 'leader' || ME.clanRole === 'deputy';
+        const isLeader = ME.clanRole === 'leader';
+        mySection.innerHTML = `
+          <div class="sec">عشيرتي — ${myClan.name} [${myClan.tag}]</div>
+          <div class="card2" style="margin-bottom:16px;">
+            <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;">
+              <div>👥 الأعضاء: <strong>${myClan.members}</strong></div>
+              <div>💰 الخزينة: <strong style="color:var(--gold)">${myClan.treasury.toLocaleString()} $</strong></div>
+              <div>🛡️ دورك: <span class="badge ${ME.clanRole}">${ME.clanRole==='leader'?'قائد':ME.clanRole==='deputy'?'مساعد':'عضو'}</span></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <input type="number" class="inp" id="donateAmount" placeholder="مبلغ التبرع..." style="margin:0;width:160px">
+              <button class="btn-sm green" onclick="donateClan()">💰 تبرع للخزينة</button>
+            </div>
+            ${canWithdraw?`
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <input type="number" class="inp" id="withdrawAmount" placeholder="مبلغ السحب..." style="margin:0;width:160px">
+              <button class="btn-sm gold" onclick="withdrawClan()">🏦 سحب من الخزينة</button>
+            </div>`:''}
+            ${isLeader?`
+            <div style="margin-top:8px;">
+              <select class="inp" id="deputyTarget" style="margin-bottom:6px"><option value="">تعيين مساعد...</option></select>
+              <button class="btn-sm blue" onclick="setDeputy()">تعيين مساعد</button>
+            </div>`:''}
+            ${ME.clanRole!=='leader'?`<button class="btn-sm" onclick="leaveClan()">مغادرة العشيرة</button>`:''}
+          </div>`;
+        // تحميل أعضاء العشيرة للتعيين
+        if(isLeader) loadClanMembers(myClan.id);
+      }
+    } else { mySection.innerHTML = ''; }
+
+    list.innerHTML = clans.length ? clans.map(c => `
+      <div class="clan-card">
+        <div><div><span class="clan-tag">[${c.tag}]</span> <span class="clan-name">${c.name}</span></div>
+        <div class="clan-info">👑 ${c.leaderName} | 👥 ${c.members} عضو | 💰 ${c.treasury.toLocaleString()} $</div>
+        ${c.description?`<div class="clan-info">${c.description}</div>`:''}
+        </div>
+        ${!ME?.clanId && c.id !== ME?.clanId ? `<button class="btn-sm green" onclick="joinClan('${c.id}')">انضمام</button>` : ''}
+      </div>`).join("") : '<div class="empty">لا توجد عشائر بعد</div>';
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadClanMembers(clanId) {
+  try {
+    const clan = await req(`/api/clans/${clanId}`);
+    const sel = document.getElementById("deputyTarget");
+    if(!sel) return;
+    sel.innerHTML = '<option value="">اختر عضو...</option>' +
+      clan.members.filter(m=>m.role==='member').map(m=>`<option value="${m.id}">${m.username}</option>`).join("");
+  } catch(e) {}
+}
+
+async function createClan() {
+  const name = document.getElementById("clanName").value.trim();
+  const tag = document.getElementById("clanTag").value.trim();
+  const description = document.getElementById("clanDesc").value.trim();
+  if(!name||!tag) return toast("أدخل الاسم والتاج","err");
+  try { await req("/api/clans/create",{method:"POST",body:JSON.stringify({name,tag,description})}); toast("✅ تم إنشاء العشيرة","ok"); await loadMe(); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+async function joinClan(id) {
+  try { await req("/api/clans/join",{method:"POST",body:JSON.stringify({clanId:id})}); toast("✅ انضممت للعشيرة","ok"); await loadMe(); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+async function leaveClan() {
+  if(!confirm("هل تريد مغادرة العشيرة؟")) return;
+  try { await req("/api/clans/leave",{method:"POST"}); toast("غادرت العشيرة","inf"); await loadMe(); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+async function donateClan() {
+  const amount = parseInt(document.getElementById("donateAmount").value);
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try { const d = await req("/api/clans/donate",{method:"POST",body:JSON.stringify({amount})}); toast(d.message,"ok"); await loadMe(); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+async function withdrawClan() {
+  const amount = parseInt(document.getElementById("withdrawAmount").value);
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try { const d = await req("/api/clans/withdraw",{method:"POST",body:JSON.stringify({amount})}); toast(d.message,"ok"); await loadMe(); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+async function setDeputy() {
+  const targetId = document.getElementById("deputyTarget").value;
+  if(!targetId) return toast("اختر عضواً","err");
+  try { const d = await req("/api/clans/deputy",{method:"POST",body:JSON.stringify({targetId})}); toast(d.message,"ok"); loadClans(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadChat() {
+  try {
+    const msgs = await req("/api/chat");
+    const box = document.getElementById("chatBox");
+    box.innerHTML = msgs.reverse().map(m => `
+      <div class="chat-msg">
+        <div class="chat-user ${m.role==='governor'?'gov':''}">${m.username} ${m.role==='governor'?'🏛️':m.role==='leader'?'🛡️':''}</div>
+        <div class="chat-text">${m.message}</div>
+        <div class="chat-time">${new Date(m.time).toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"})}</div>
+      </div>`).join("");
+  } catch(e) {}
+}
+
+async function sendChat() {
+  const input = document.getElementById("chatInput");
+  const message = input.value.trim();
+  if(!message) return;
+  try { await req("/api/chat",{method:"POST",body:JSON.stringify({message})}); input.value=""; await loadChat(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function loadLeaderboard() {
+  try {
+    const lb = await req("/api/leaderboard");
+    document.getElementById("lbBody").innerHTML = lb.map((p,i)=>`
+      <tr class="${i===0?"r1":i===1?"r2":i===2?"r3":""}">
+        <td><span class="rn">${i+1}</span></td>
+        <td>${p.username} ${p.role==="governor"?"🏛️":""}</td>
+        <td>💰 ${p.money.toLocaleString()}</td>
+        <td>💪 ${p.strength}</td>
+        <td>🥷 ${p.stealth}</td>
+        <td>🧠 ${p.intelligence}</td>
+      </tr>`).join("");
+  } catch(e) {}
+}
+
+async function surrender() {
+  try { const d = await req("/api/surrender",{method:"POST"}); toast("🤝 سلّمت نفسك","inf"); log("سلّمت نفسك","inf"); startJailTimer(d.jail_until); loadMe(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function becomeAdmin() {
+  const code = prompt("أدخل الكود:");
+  if(!code) return;
+  try { const d = await req("/api/become-admin",{method:"POST",body:JSON.stringify({code})}); toast(d.message,"ok"); log(d.message,"gd"); await loadMe(); } catch(e) { toast(e.message,"err"); }
+}
+
+// الكازينو
+async function bet(choice) {
+  const amount = parseInt(document.getElementById("betAmount").value);
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try {
+    const d = await req("/api/casino/bet",{method:"POST",body:JSON.stringify({amount,choice})});
+    const res = document.getElementById("casinoResult");
+    const color = d.result===0?"🟢":d.result%2===0?"⚫":"🔴";
+    res.innerHTML = `${color} الرقم: <strong>${d.result}</strong> — ${d.won>0?`<span style="color:var(--green)">ربحت ${d.won.toLocaleString()} $</span>`:`<span style="color:var(--red)">خسرت ${amount.toLocaleString()} $</span>`}`;
+    if(d.won>0) { toast(`🎰 ربحت ${d.won.toLocaleString()} $!`,"ok"); log(`ربحت في الكازينو ${d.won.toLocaleString()} $`,"gd"); }
+    else { log(`خسرت في الكازينو ${amount.toLocaleString()} $`,"fl"); }
+    loadMe();
+  } catch(e) { toast(e.message,"err"); }
+}
+async function betNumber() {
+  const num = parseInt(document.getElementById("betNum").value);
+  if(isNaN(num)||num<0||num>36) return toast("أدخل رقماً بين 0 و 36","err");
+  document.getElementById("betAmount").value = document.getElementById("betAmount").value || "100";
+  await bet(num);
+}
+
+// لوحة الحاكم
+async function loadGov() {
+  try {
+    const users = await req("/api/gov/players");
+    // تعبئة قائمة الاختيار
+    const sel = document.getElementById("govTarget");
+    sel.innerHTML = '<option value="">اختر لاعب...</option>' + users.map(u=>`<option value="${u.id}">${u.username}</option>`).join("");
+    document.getElementById("govBody").innerHTML = users.map(u=>`
+      <tr>
+        <td>${u.username}</td>
+        <td><span class="badge ${u.role}">${u.role==="governor"?"🏛️ حاكم":"لاعب"}</span></td>
+        <td>${u.money.toLocaleString()} $</td>
+        <td>${u.heat}🔥</td>
+        <td>
+          <button class="btn-jail" onclick="govJail('${u.id}')">سجن</button>
+          <button class="btn-rel" onclick="govRelease('${u.id}')">إفراج</button>
+        </td>
+      </tr>`).join("");
+  } catch(e) { toast(e.message,"err"); }
+}
+
+async function govGiveMoney() {
+  const targetId = document.getElementById("govTarget").value;
+  const amount = parseInt(document.getElementById("govAmount").value);
+  if(!targetId) return toast("اختر لاعباً","err");
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try { const d = await req("/api/gov/give-money",{method:"POST",body:JSON.stringify({targetId,amount})}); toast(d.message,"ok"); } catch(e) { toast(e.message,"err"); }
+}
+async function govJail(id) {
+  const mins = prompt("كم دقيقة؟","10");
+  if(!mins) return;
+  try { await req(`/api/gov/jail/${id}`,{method:"POST",body:JSON.stringify({minutes:parseInt(mins)})}); toast("تم السجن ✅","ok"); loadGov(); } catch(e) { toast(e.message,"err"); }
+}
+async function govRelease(id) {
+  try { await req(`/api/gov/release/${id}`,{method:"POST"}); toast("تم الإفراج ✅","ok"); loadGov(); } catch(e) { toast(e.message,"err"); }
+}
+
+// لوحة الأدمن
+async function loadAdmin() {
+  try {
+    const users = await req("/api/admin/users");
+    ["adminMoneyTarget","adminWeaponTarget","adminGovTarget"].forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">اختر لاعب...</option>' + users.map(u=>`<option value="${u.id}">${u.username} (${u.role})</option>`).join("");
+    });
+    document.getElementById("adminBody").innerHTML = users.map(u=>`
+      <tr>
+        <td>${u.username}</td>
+        <td><span class="badge ${u.role}">${u.role==="admin"?"👑 أدمن":u.role==="governor"?"🏛️ حاكم":"لاعب"}</span></td>
+        <td>${u.money.toLocaleString()} $</td>
+        <td>${u.heat}🔥</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn-jail" onclick="adminJail('${u.id}')">سجن</button>
+          <button class="btn-rel" onclick="adminRelease('${u.id}')">إفراج</button>
+        </td>
+      </tr>`).join("");
+  } catch(e) {}
+}
+
+async function loadAdminSystems() {
+  try {
+    const systems = await req("/api/admin/systems");
+    document.getElementById("systemsControl").innerHTML = systems.map(s=>`
+      <div class="sys-toggle">
+        <div><div class="sys-name">${s.icon} ${s.name}</div><div style="font-size:11px;color:var(--dim)">${s.id}</div></div>
+        <label class="toggle">
+          <input type="checkbox" ${s.enabled?"checked":""} onchange="toggleSystem('${s.id}',this.checked)">
+          <span class="toggle-sl"></span>
+        </label>
+      </div>`).join("");
+  } catch(e) {}
+}
+
+async function toggleSystem(id, enabled) {
+  try { const d = await req(`/api/admin/systems/${id}/toggle`,{method:"POST",body:JSON.stringify({enabled})}); toast(d.message,"ok"); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminAddSystem() {
+  const id = document.getElementById("newSysId").value.trim();
+  const name = document.getElementById("newSysName").value.trim();
+  const icon = document.getElementById("newSysIcon").value.trim();
+  if(!id||!name) return toast("أدخل المعرف والاسم","err");
+  try { const d = await req("/api/admin/systems/new",{method:"POST",body:JSON.stringify({id,name,icon})}); toast(d.message,"ok"); loadAdminSystems(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminGiveMoney() {
+  const targetId = document.getElementById("adminMoneyTarget").value;
+  const amount = parseInt(document.getElementById("adminMoneyAmount").value);
+  if(!targetId) return toast("اختر لاعباً","err");
+  if(!amount||amount<=0) return toast("أدخل مبلغاً","err");
+  try { const d = await req("/api/admin/give-money",{method:"POST",body:JSON.stringify({targetId,amount})}); toast(d.message,"ok"); loadAdmin(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminGiveWeapon() {
+  const targetId = document.getElementById("adminWeaponTarget").value;
+  const weaponId = document.getElementById("adminWeaponId").value;
+  if(!targetId||!weaponId) return toast("اختر لاعباً وسلاحاً","err");
+  try { const d = await req("/api/admin/give-weapon",{method:"POST",body:JSON.stringify({targetId,weaponId})}); toast(d.message,"ok"); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminSetGov() {
+  const targetId = document.getElementById("adminGovTarget").value;
+  if(!targetId) return toast("اختر لاعباً","err");
+  try { const d = await req("/api/admin/set-governor",{method:"POST",body:JSON.stringify({targetId})}); toast(d.message,"ok"); loadAdmin(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminRemoveGov() {
+  const targetId = document.getElementById("adminGovTarget").value;
+  if(!targetId) return toast("اختر لاعباً","err");
+  try { const d = await req("/api/admin/remove-governor",{method:"POST",body:JSON.stringify({targetId})}); toast(d.message,"ok"); loadAdmin(); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminResetStocks() {
+  if(!confirm("هل تريد إعادة ضبط الأسهم؟ ستُفقد أسهم جميع اللاعبين!")) return;
+  try { const d = await req("/api/admin/reset-stocks",{method:"POST"}); toast(d.message,"ok"); } catch(e) { toast(e.message,"err"); }
+}
+
+async function adminJail(id) {
+  const mins = prompt("كم دقيقة؟","10");
+  if(!mins) return;
+  try { await req(`/api/admin/jail/${id}`,{method:"POST",body:JSON.stringify({minutes:parseInt(mins)})}); toast("تم السجن ✅","ok"); loadAdmin(); } catch(e) { toast(e.message,"err"); }
+}
+async function adminRelease(id) {
+  try { await req(`/api/admin/release/${id}`,{method:"POST"}); toast("تم الإفراج ✅","ok"); loadAdmin(); } catch(e) { toast(e.message,"err"); }
+}
+
+window.onload = async () => {
+  if(TOKEN) { try { await enterGame(); } catch(e) { localStorage.removeItem("ce_token"); TOKEN=null; } }
+};
+</script>
+</body>
+</html>
